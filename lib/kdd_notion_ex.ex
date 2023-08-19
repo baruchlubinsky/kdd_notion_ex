@@ -1,18 +1,15 @@
 defmodule KddNotionEx do
-  @moduledoc """
-  Documentation for `KddNotionEx`.
-  """
+  @moduledoc false
 
-  @doc """
-  Hello world.
+  use Application
 
-  ## Examples
+  @impl true
+  def start(_type, _args) do
+    children = [
+      {Finch, name: KddNotionEx.Api.ps()}
+    ]
 
-      iex> KddNotionEx.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    opts = [strategy: :one_for_one, name: KddNotionEx.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
