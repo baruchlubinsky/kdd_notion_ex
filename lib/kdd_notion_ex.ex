@@ -1,10 +1,14 @@
 defmodule KddNotionEx do
   @moduledoc false
 
-  use Application
+  use Supervisor
 
   @impl true
-  def start(_type, _args) do
+  def init(args) do
+    args
+  end
+
+  def start_link(_args) do
     children = [
       {Finch, name: KddNotionEx.Api.ps()}
     ]
