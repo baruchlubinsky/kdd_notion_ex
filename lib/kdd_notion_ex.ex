@@ -16,4 +16,11 @@ defmodule KddNotionEx do
     opts = [strategy: :one_for_one, name: KddNotionEx.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  def child_spec(opts) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [opts]}
+    }
+  end
 end
