@@ -1,4 +1,4 @@
-defmodule Kdd.Notion.Page do
+defmodule KddNotionEx.Page do
   import KddNotionEx.Api
 
   def get(page_id, token) do
