@@ -28,6 +28,14 @@ defmodule KddNotionEx.Templates do
     }
   end
 
+  def phone_number_prop(key, value) do
+    %{
+      key => %{
+        phone_number: value
+      }
+    }
+  end
+
   def datestamp(key) do
     %{
       key => %{

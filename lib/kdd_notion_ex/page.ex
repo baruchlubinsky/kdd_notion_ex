@@ -6,6 +6,18 @@ defmodule KddNotionEx.Page do
     |> request!()
   end
 
+  def fetch(page_id, token) do
+    get(page_id, token)
+    |> decode_response()
+  end
+
+  def decode_response(response) do
+    case response do
+      %Finch.Response{status: 200, body: body} ->
+        Jason.decode!(body)
+      end
+  end
+
   def create_record(properties, database_id, token) do
     payload = %{
       parent: %{database_id: database_id},
