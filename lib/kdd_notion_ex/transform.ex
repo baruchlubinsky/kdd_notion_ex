@@ -28,9 +28,12 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"relation" => [%{"id" => value}], "type" => "relation"}), do: value
   def parse_property(%{"relation" => value, "type" => "relation"}), do: value
   def parse_property(%{"title" => [%{"plain_text" => value}], "type" => "title"}), do: value
-  def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: value
+  def parse_property(%{"date" => %{"start" => value, "end" => nil}, "type" => "date"}), do: value
+  def parse_property(%{"date" => %{"start" => start_date, "end" => end_date}, "type" => "date"}), do: {start_date, end_date}
   def parse_property(%{"formula" => prop, "type" => "formula"}), do: parse_property(prop)
   def parse_property(%{"rollup" => prop, "type" => "rollup"}), do: parse_property(prop)
+  def parse_property(%{"array" => [prop], "type" => "array"}), do: parse_property(prop)
+  def parse_property(%{"array" => props, "type" => "array"}), do: Enum.map(props, fn prop -> parse_property(prop) end)
 
   def parse_property(other), do: other
 
