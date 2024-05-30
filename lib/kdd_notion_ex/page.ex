@@ -26,4 +26,9 @@ defmodule KddNotionEx.Page do
     Finch.build(:post, "https://api.notion.com/v1/pages", headers(token), Jason.encode!(payload))
     |> request!()
   end
+
+  def update(page_id, properties, token) do
+    Finch.build(:patch, "https://api.notion.com/v1/pages/#{page_id}", headers(token), Jason.encode!(%{properties: properties}))
+    |> request!()
+  end
 end

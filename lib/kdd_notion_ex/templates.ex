@@ -36,13 +36,25 @@ defmodule KddNotionEx.Templates do
     }
   end
 
-  def datestamp(key) do
+  def date_prop(key, value) do
     %{
       key => %{
         type: "date",
         date: %{
-          start: Date.to_iso8601(Date.utc_today)
+          start: Date.to_iso8601(value)
         }
+      }
+    }
+  end
+
+  def datestamp(key) do
+    date_prop(key,Date.utc_today)
+  end
+
+  def checkbox_prop(key, value) when value in [true, false] do
+    %{
+      key => %{
+        checkbox: value
       }
     }
   end
