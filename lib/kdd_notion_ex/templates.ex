@@ -28,6 +28,15 @@ defmodule KddNotionEx.Templates do
     }
   end
 
+  def phone_number_prop(key, value) do
+    %{
+      key => %{
+        type: "phone_number",
+        phone_number: value
+      }
+    }
+  end
+
   def datestamp(key) do
     %{
       key => %{
@@ -47,6 +56,14 @@ defmodule KddNotionEx.Templates do
           id: value,
           database_id: database
         }]
+      }
+    }
+  end
+
+  def checkbox_prop(key, value) when value in [true, false] do
+    %{
+      key => %{
+        checkbox: value
       }
     }
   end

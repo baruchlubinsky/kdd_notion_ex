@@ -23,14 +23,22 @@ defmodule KddNotionEx.Transform do
     end)
   end
 
+  def parse_date(string) do
+    {:ok, dt, _} = DateTime.from_iso8601(string)
+    dt
+  end
+
   def parse_property(%{"number" => value, "type" => "number"}), do: value
   def parse_property(%{"checkbox" => value, "type" => "checkbox"}), do: value
   def parse_property(%{"relation" => [%{"id" => value}], "type" => "relation"}), do: value
   def parse_property(%{"relation" => value, "type" => "relation"}), do: value
   def parse_property(%{"title" => [%{"plain_text" => value}], "type" => "title"}), do: value
-  def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: value
+  def parse_property(%{"date" => %{"start" => start_time, "end" => end_time}, "type" => "date"}), do: {parse_date(start_time), parse_date(end_time)}
+  def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: parse_date(value)
   def parse_property(%{"formula" => prop, "type" => "formula"}), do: parse_property(prop)
   def parse_property(%{"rollup" => prop, "type" => "rollup"}), do: parse_property(prop)
+
+  def parse_property(%{"array" => [prop]}), do: parse_property(prop)
 
   def parse_property(other), do: other
 

@@ -17,6 +17,13 @@ defmodule KddNotionEx.Api do
     Finch.request!(payload, ps())
   end
 
+  def read_body(response) do
+    case response do
+      %Finch.Response{status: 200, body: body} ->
+        Jason.decode!(body)
+    end
+  end
+
   def ps() do
     KddNotionEx.Finch
   end
