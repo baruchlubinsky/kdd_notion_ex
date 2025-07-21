@@ -1,4 +1,5 @@
 defmodule KddNotionEx.Transform do
+require Logger
 
   def table_to_options(data, column) do
     Enum.flat_map(data, fn
@@ -23,9 +24,25 @@ defmodule KddNotionEx.Transform do
     end)
   end
 
+  def parse_date(string) when is_nil(string), do: nil
+
+  # Dates without times in DD-MM-YYYY
+  def parse_date(string) when byte_size(string) == 10 do
+    case Date.from_iso8601(string) do
+      {:ok, dt} -> dt
+      {:error, :invalid_format} ->
+        Logger.warning("Invalid date string #{string}")
+        string
+      end
+  end
+
   def parse_date(string) do
-    {:ok, dt, _} = DateTime.from_iso8601(string)
-    dt
+    case DateTime.from_iso8601(string) do
+      {:ok, dt, _} -> dt
+      {:error, :invalid_format} ->
+        Logger.warning("Invalid date string #{string}")
+        string
+      end
   end
 
   def parse_property(%{"number" => value, "type" => "number"}), do: value
