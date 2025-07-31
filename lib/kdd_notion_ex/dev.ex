@@ -1,9 +1,8 @@
 defmodule KddNotionEx.Dev do
-  import KddNotionEx.Api
 
   def whoami(token) do
-    Finch.build(:get, "https://api.notion.com/v1/users/me", headers(token))
-    |> request!()
+    KddNotionEx.Client.new(token)
+    |> Req.get!(url: "/users/me")
   end
 
 end
