@@ -1,12 +1,11 @@
 defmodule KddNotionEx.User do
-  import KddNotionEx.Api
 
   def me(token) do
-    Finch.build(:get, "https://api.notion.com/v1/users/me", headers(token))
-    |> request!()
+    KddNotionEx.Client.new(token)
+    |> Req.get!("/users/me")
     |> case do
-      %Finch.Response{status: 200, body: body} ->
-        Jason.decode!(body)
+      %Req.Response{status: 200, body: body} ->
+        body
       err ->
         IO.inspect(err)
     end
