@@ -10,7 +10,7 @@ by adding `kdd_notion_ex` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:kdd_notion_ex, "~> 0.1.0"}
+    {:kdd_notion_ex, "~> 0.2.0"}
   ]
 end
 ```

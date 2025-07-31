@@ -1,8 +1,14 @@
 defmodule KddNotionEx.Database do
 
   def get_properties(req, database_id) do
-    Req.get!(req, url: "/databases/#{database_id}")
-    |> KddNotionEx.Client.response("properties")
+    {_, data} = Cachex.fetch(:notion_databases, database_id, fn id ->
+      {
+        :commit,
+        Req.get!(req, url: "/databases/#{id}")
+        |> KddNotionEx.Client.response("properties")
+      }
+    end)
+    data
   end
 
   def query(req, database_id, query) do
