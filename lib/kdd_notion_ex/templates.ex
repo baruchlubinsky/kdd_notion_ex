@@ -60,6 +60,17 @@ defmodule KddNotionEx.Templates do
     }
   end
 
+  def relation_prop(key, value) do
+    %{
+      key => %{
+        type: "relation",
+        relation: [%{
+          id: value
+        }]
+      }
+    }
+  end
+
   def checkbox_prop(key, value) when value in [true, false] do
     %{
       key => %{

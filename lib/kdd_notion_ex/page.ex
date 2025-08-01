@@ -45,4 +45,21 @@ defmodule KddNotionEx.Page do
     response
   end
 
+  def fetch_content(req, page_id, start_cursor \\ nil) do
+    url = if is_nil(start_cursor) do
+      "/blocks/#{page_id}/children"
+    else
+      "/blocks/#{page_id}/children?start_cursor=#{start_cursor}"
+    end
+    Req.get!(req, url: url)
+    |> case do
+      %Req.Response{status: 200, body: response} ->
+        if response["has_more"] do
+          response["results"] ++ fetch_content(req, page_id, response["next_cursor"])
+        else
+          response["results"]
+        end
+    end
+  end
+
 end
