@@ -20,24 +20,29 @@ defmodule KddNotionEx.Page do
       parent: %{database_id: database_id},
       properties: properties
     }
-    data =
-    Req.post!(req, url: "/pages", json: payload)
-    |> KddNotionEx.Client.response()
+    response = Req.post!(req, url: "/pages", json: payload)
 
-    Cachex.put(:notion_pages, data["id"], data)
-    data
+    case response do
+      %Req.Response{status: 200, body: body} ->
+        Cachex.put(:notion_pages, body["id"], body)
+    end
+
+    response
   end
 
   def update(req, properties, page_id) do
+    Cachex.del(:notion_pages, page_id)
     payload = %{
       properties: properties
     }
+    response = Req.patch!(req, url: "/pages/#{page_id}", json: payload)
 
-    data =
-    Req.patch!(req, url: "/pages/#{page_id}", json: payload)
-    |> KddNotionEx.Client.response()
+    case response do
+      %Req.Response{status: 200, body: body} ->
+        Cachex.put(:notion_pages, body["id"], body)
+    end
 
-    Cachex.put(:notion_pages, data["id"], data)
-    data
+    response
   end
+
 end
