@@ -60,6 +60,32 @@ defmodule KddNotionEx.Page do
           response["results"]
         end
     end
+
+    def elements(blocks) do
+      Enum.reject(blocks, fn b -> b["archived"] end)
+      |> Enum.map(&block_as_elements/1)
+    end
+
+    def block_as_elements(block) when is_list(block) do
+      Enum.map(block, &block_as_elements/1)
+    end
+
+    def block_as_elements(%{"type" => "paragraph"} = block) do
+      {:p, block_as_elements(block["paragraph"]["rich_text"])}
+    end
+
+    def block_as_elements(%{"type" => "text"} = block) do
+      if is_nil(block["href"]) do
+        {:s, block_as_elements(block["text"]["content"])}
+      else
+        {:s, {:a, block["href"], block["text"]["content"]}}
+      end
+    end
+
+    def block_as_elements(%{"type" => "divider"}) do
+      {:hr}
+    end
+
   end
 
 end
