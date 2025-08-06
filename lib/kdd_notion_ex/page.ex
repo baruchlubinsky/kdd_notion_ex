@@ -75,53 +75,19 @@ defmodule KddNotionEx.Page do
     end
   end
 
-  def elements(blocks) do
-    Enum.reject(blocks, fn b -> b["archived"] end)
-    |> Enum.map(&block_as_elements/1)
-  end
-
-  def block_as_elements(block) when is_list(block) do
-    Enum.map(block, &block_as_elements/1)
-  end
-
-  def block_as_elements(block) when is_binary(block) do
-    block
-  end
-
-  def block_as_elements(%{"type" => "paragraph"} = block) do
-    {:p, block_as_elements(block["paragraph"]["rich_text"])}
-  end
-
-  def block_as_elements(%{"type" => "callout"} = block) do
-    {:p, block_as_elements(block["callout"]["rich_text"])}
-  end
-
-  def block_as_elements(%{"type" => "text"} = block) do
-    if is_nil(block["href"]) do
-      {:s, block_as_elements(block["text"]["content"])}
-    else
-      {:s, {:a, block["href"], block["text"]["content"]}}
+  def fetch_block(req, block_id) do
+    Req.get!(req, url: "/blocks/#{block_id}")
+    |> case do
+      %Req.Response{status: 200, body: response} ->
+        response
     end
   end
 
-  def block_as_elements(%{"type" => "heading_1"} = block) do
-    {:h1, block_as_elements(block["heading_1"]["rich_text"])}
+  def elements(blocks, opts \\ []) do
+    Enum.reject(blocks, fn b -> b["archived"] end)
+    |> Enum.map(fn block -> KddNotionEx.CMS.Elements.block_as_elements(block, opts) end)
   end
 
-  def block_as_elements(%{"type" => "heading_2"} = block) do
-    {:h2, block_as_elements(block["heading_2"]["rich_text"])}
-  end
 
-  def block_as_elements(%{"type" => "heading_3"} = block) do
-    {:h3, block_as_elements(block["heading_3"]["rich_text"])}
-  end
-
-  def block_as_elements(%{"type" => "divider"}) do
-    {:hr}
-  end
-
-  def block_as_elements(%{"type" => "image", "image" => %{"file" => %{"url" => url}}}) do
-    {:image, url}
-  end
 
 end
