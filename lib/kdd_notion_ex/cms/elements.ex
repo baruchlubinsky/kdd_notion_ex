@@ -14,7 +14,11 @@ defmodule KddNotionEx.CMS.Elements do
   end
 
   def block_as_elements(%{"type" => "callout"} = block, opts) do
-    {:p, block_as_elements(block["callout"]["rich_text"], opts)}
+    {:cta, block_as_elements(block["callout"]["rich_text"], opts)}
+  end
+
+  def block_as_elements(%{"type" => "bulleted_list_item"} = block, opts) do
+    {:li, block_as_elements(block["bulleted_list_item"]["rich_text"], opts)}
   end
 
   def block_as_elements(%{"type" => "text"} = block, opts) do
@@ -60,7 +64,7 @@ defmodule KddNotionEx.CMS.Elements do
     data
   end
 
-  def block_as_elements(%{"href" => notion_url, "mention" => %{"page" => %{"id" => page_id}}, "plain_text" => text, "type" => "mention"}, opts) do
+  def block_as_elements(%{"type" => "mention", "href" => notion_url, "mention" => %{"page" => %{"id" => page_id}}, "plain_text" => text}, opts) do
     href =
     if Keyword.has_key?(opts, :paths) do
       id = String.replace(page_id, "-", "")
@@ -70,5 +74,7 @@ defmodule KddNotionEx.CMS.Elements do
     end
     block_as_elements(%{"type" => "text", "href" => href, "text" => %{"content" => text}}, opts)
   end
+
+
 
 end
