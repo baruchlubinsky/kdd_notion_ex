@@ -6,11 +6,24 @@ defmodule KddNotionEx.Page do
 
   def fetch(req, page_id) do
     {_, data} = Cachex.fetch(KddNotionEx.Cache.pages(), page_id, fn id ->
-      {
-        :commit,
+      page =
         get(req, id)
         |> KddNotionEx.Client.response()
-      }
+
+      if Enum.any?(page["properties"], fn {_name, property} ->
+        property["type"] == "files" && Enum.any?(property["files"], fn p -> Map.has_key?(p, "expiry") end)
+      end) do
+        {
+          :commit,
+          page,
+          expire: :timer.seconds(3550) # Notion API returns links valid for 1 hour
+        }
+      else
+        {
+          :commit,
+          page
+        }
+      end
     end)
     data
   end

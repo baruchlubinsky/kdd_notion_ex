@@ -41,6 +41,8 @@ defmodule KddNotionEx.CMS.Model do
 
   def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
   def ecto_type_to_notion_type(KddNotionEx.Types.Select), do: "select"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Checkbox), do: "checkbox"
+  def ecto_type_to_notion_type(KddNotionEx.Types.URL), do: "url"
   def ecto_type_to_notion_type(:string), do: "rich_text"
   def ecto_type_to_notion_type(number) when number in [:integer, :float, :decimal], do: "number"
   def ecto_type_to_notion_type(date) when date in [:naive_datetime, :utc_datetime], do: "date"
