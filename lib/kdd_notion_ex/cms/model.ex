@@ -9,8 +9,9 @@ defmodule KddNotionEx.CMS.Model do
       @primary_key {:id, :binary_id, autogenerate: false}
 
       def validate_notion_db(req, id) do
-        Cachex.del(:notion_databases, id)
-        db_properties = KddNotionEx.Database.get_properties(req, id)
+        db_properties =
+          Req.get!(req, url: "/databases/#{id}")
+          |> KddNotionEx.Client.response("properties")
         fields = fields()
 
         Enum.map(fields, fn {type, name} ->
@@ -40,6 +41,7 @@ defmodule KddNotionEx.CMS.Model do
   end
 
   def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Formula), do: "formula"
   def ecto_type_to_notion_type(KddNotionEx.Types.Select), do: "select"
   def ecto_type_to_notion_type(KddNotionEx.Types.Checkbox), do: "checkbox"
   def ecto_type_to_notion_type(KddNotionEx.Types.URL), do: "url"

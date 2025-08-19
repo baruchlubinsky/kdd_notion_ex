@@ -5,6 +5,8 @@ defmodule KddNotionEx.CMS.Config do
     field :"Page", KddNotionEx.Types.Title
     field :"Page URL", KddNotionEx.Types.URL
     field :"Published", KddNotionEx.Types.Checkbox
+    field :"ID", KddNotionEx.Types.Formula
+
   end
 
 
