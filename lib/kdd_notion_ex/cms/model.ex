@@ -27,6 +27,14 @@ defmodule KddNotionEx.CMS.Model do
         end)
       end
 
+      def validate_notion_db!(req, id) do
+        fields = validate_notion_db(req, id)
+
+        if Enum.any?(fields, fn f -> f != :ok end) do
+          raise fields
+        end
+      end
+
       def fields() do
         __MODULE__.__schema__(:fields)
         |> Enum.reject(fn k -> k == :id end)
