@@ -5,26 +5,30 @@ defmodule KddNotionEx.CMS.Model do
       use Ecto.Schema
       import Ecto.Changeset
 
-
       @primary_key {:id, :binary_id, autogenerate: false}
 
       def validate_notion_db(req, id) do
-        db_properties =
-          Req.get!(req, url: "/databases/#{id}")
-          |> KddNotionEx.Client.response("properties")
-        fields = fields()
 
-        Enum.map(fields, fn {type, name} ->
-          if Map.has_key?(db_properties, "#{name}") do
-            if Map.has_key?(db_properties["#{name}"], KddNotionEx.CMS.Model.ecto_type_to_notion_type(type)) do
-              :ok
-            else
-              {:error, "#{name} has wrong type, expected #{KddNotionEx.CMS.Model.ecto_type_to_notion_type(type)}."}
-            end
-          else
-            {:error, "#{name} is missing from Notion properties."}
+          Req.get(req, url: "/databases/#{id}")
+          |> case do
+            {:ok, %Req.Response{status: 200, body: response}} ->
+              db_properties = response["properties"]
+
+              Enum.map(fields(), fn {type, name} ->
+                if Map.has_key?(db_properties, "#{name}") do
+                  if Map.has_key?(db_properties["#{name}"], KddNotionEx.CMS.Model.ecto_type_to_notion_type(type)) do
+                    :ok
+                  else
+                    {:error, "#{name} has wrong type, expected #{KddNotionEx.CMS.Model.ecto_type_to_notion_type(type)}."}
+                  end
+                else
+                  {:error, "#{name} is missing from Notion properties."}
+                end
+              end)
+            {:ok, %Req.Response{status: 400, body: response}} ->
+              [error: response["message"]]
           end
-        end)
+
       end
 
       def validate_notion_db!(req, id) do
@@ -33,6 +37,8 @@ defmodule KddNotionEx.CMS.Model do
         if Enum.any?(fields, fn f -> f != :ok end) do
           raise fields
         end
+
+        :ok
       end
 
       def fields() do
@@ -51,6 +57,7 @@ defmodule KddNotionEx.CMS.Model do
   def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
   def ecto_type_to_notion_type(KddNotionEx.Types.Formula), do: "formula"
   def ecto_type_to_notion_type(KddNotionEx.Types.Select), do: "select"
+  def ecto_type_to_notion_type(KddNotionEx.Types.MultiSelect), do: "multi_select"
   def ecto_type_to_notion_type(KddNotionEx.Types.Checkbox), do: "checkbox"
   def ecto_type_to_notion_type(KddNotionEx.Types.URL), do: "url"
   def ecto_type_to_notion_type(:string), do: "rich_text"
