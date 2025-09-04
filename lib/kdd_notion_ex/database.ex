@@ -11,21 +11,24 @@ defmodule KddNotionEx.Database do
     data
   end
 
+  def query_live(req, database_id, query \\ %{}) do
+    Req.post!(req, url: "/databases/#{database_id}/query", json: query)
+    |> case do
+      %Req.Response{status: 200, body: response} ->
+        if response["has_more"] do
+        query = Map.put(query, "start_cursor", response["next_cursor"])
+        response["results"] ++ query_page(req, database_id, query)
+      else
+        response["results"]
+      end
+    end
+  end
+
   def query(req, database_id, query) do
     {_, data} = Cachex.fetch(KddNotionEx.Cache.queries(), {database_id, query}, fn _ ->
       {
         :commit,
-        Req.post!(req, url: "/databases/#{database_id}/query", json: query)
-        |> case do
-          %Req.Response{status: 200, body: response} ->
-            if response["has_more"] do
-            query = query || %{}
-              |> Map.put("start_cursor", response["next_cursor"])
-            response["results"] ++ query_page(req, database_id, query)
-          else
-            response["results"]
-          end
-        end
+        query_live(req, database_id, query)
       }
     end)
     data

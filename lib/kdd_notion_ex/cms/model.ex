@@ -27,6 +27,8 @@ defmodule KddNotionEx.CMS.Model do
               end)
             {:ok, %Req.Response{status: 400, body: response}} ->
               [error: response["message"]]
+            {:ok, %Req.Response{status: 404, body: response}} ->
+              [error: "404 Not found. Please confirm that the integration has access to that page."]
           end
 
       end
@@ -62,7 +64,7 @@ defmodule KddNotionEx.CMS.Model do
   def ecto_type_to_notion_type(KddNotionEx.Types.URL), do: "url"
   def ecto_type_to_notion_type(:string), do: "rich_text"
   def ecto_type_to_notion_type(number) when number in [:integer, :float, :decimal], do: "number"
-  def ecto_type_to_notion_type(date) when date in [:naive_datetime, :utc_datetime], do: "date"
+  def ecto_type_to_notion_type(date) when date in [:naive_datetime, :utc_datetime, :date], do: "date"
 
   def notion_property({type, name}) do
     %{

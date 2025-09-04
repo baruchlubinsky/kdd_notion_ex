@@ -4,7 +4,7 @@ defmodule KddNotionEx.MixProject do
   def project do
     [
       app: :kdd_notion_ex,
-      version: "0.2.6",
+      version: "0.2.7",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps()
