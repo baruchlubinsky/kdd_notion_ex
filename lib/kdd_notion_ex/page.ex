@@ -11,12 +11,12 @@ defmodule KddNotionEx.Page do
         |> KddNotionEx.Client.response()
 
       if Enum.any?(page["properties"], fn {_name, property} ->
-        property["type"] == "files" && Enum.any?(property["files"], fn p -> Map.has_key?(p, "expiry") end)
+        property["type"] == "files" && Enum.any?(property["files"], fn p -> Map.has_key?(p["file"], "expiry_time") end)
       end) do
         {
           :commit,
           page,
-          expire: :timer.seconds(3550) # Notion API returns links valid for 1 hour
+          expire: :timer.seconds(3550) # Notion API returns links valid for 1 hour (expire 10 seconds early)
         }
       else
         {
