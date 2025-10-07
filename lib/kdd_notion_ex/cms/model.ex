@@ -5,11 +5,13 @@ defmodule KddNotionEx.CMS.Model do
       use Ecto.Schema
       import Ecto.Changeset
 
+      alias KddNotionEx.Types
+
       @primary_key {:id, :binary_id, autogenerate: false}
 
-      def validate_notion_db(req, id) do
+      def validate_notion_ds(req, id) do
 
-          Req.get(req, url: "/databases/#{id}")
+          Req.get(req, url: "/data_sources/#{id}")
           |> case do
             {:ok, %Req.Response{status: 200, body: response}} ->
               db_properties = response["properties"]
@@ -25,6 +27,17 @@ defmodule KddNotionEx.CMS.Model do
                   {:error, "#{name} is missing from Notion properties."}
                 end
               end)
+              Enum.map(relations(), fn{_type, _cardinality, name} ->
+                if Map.has_key?(db_properties, "#{name}") do
+                  if Map.has_key?(db_properties["#{name}"], "relation") do
+                    :ok
+                  else
+                    {:error, "#{name} has wrong type, expected relation."}
+                  end
+                else
+                  {:error, "#{name} is missing from Notion properties."}
+                end
+              end)
             {:ok, %Req.Response{status: 400, body: response}} ->
               [error: response["message"]]
             {:ok, %Req.Response{status: 404, body: response}} ->
@@ -33,8 +46,8 @@ defmodule KddNotionEx.CMS.Model do
 
       end
 
-      def validate_notion_db!(req, id) do
-        fields = validate_notion_db(req, id)
+      def validate_notion_ds!(req, id) do
+        fields = validate_notion_ds(req, id)
 
         if Enum.any?(fields, fn f -> f != :ok end) do
           raise fields
@@ -49,27 +62,44 @@ defmodule KddNotionEx.CMS.Model do
         |> Enum.map(fn field -> {__MODULE__.__schema__(:type, field), field} end)
       end
 
+      def relations() do
+        __MODULE__.__schema__(:associations)
+        |> Enum.map(fn assoc -> __MODULE__.__schema__(:association, assoc) end)
+        |> Enum.map(fn assoc -> {assoc.related, assoc.cardinality, assoc.field} end)
+      end
+
       def fields_as_properties() do
         fields()
         |> Enum.map(&KddNotionEx.CMS.Model.notion_property/1)
       end
+
+      def serialize(record) do
+        Enum.map(fields(), fn {type, field} ->
+          KddNotionEx.CMS.Properties.serialize(type, field, Map.fetch!(record, field))
+        end)
+      end
     end
   end
 
-  def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Text), do: "rich_text"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Date), do: "date"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Phone), do: "phone"
   def ecto_type_to_notion_type(KddNotionEx.Types.Formula), do: "formula"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
   def ecto_type_to_notion_type(KddNotionEx.Types.Select), do: "select"
   def ecto_type_to_notion_type(KddNotionEx.Types.MultiSelect), do: "multi_select"
   def ecto_type_to_notion_type(KddNotionEx.Types.Checkbox), do: "checkbox"
   def ecto_type_to_notion_type(KddNotionEx.Types.URL), do: "url"
   def ecto_type_to_notion_type(:string), do: "rich_text"
+  def ecto_type_to_notion_type(:id), do: "id"
+
   def ecto_type_to_notion_type(number) when number in [:integer, :float, :decimal], do: "number"
   def ecto_type_to_notion_type(date) when date in [:naive_datetime, :utc_datetime, :date], do: "date"
 
-  def notion_property({type, name}) do
+  def notion_property({type, name}, value \\ %{}) do
     %{
       "#{name}" => %{
-        ecto_type_to_notion_type(type) => %{}
+        ecto_type_to_notion_type(type) => value
       }
     }
   end

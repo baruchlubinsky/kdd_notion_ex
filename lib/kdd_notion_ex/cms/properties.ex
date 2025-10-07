@@ -1,97 +1,43 @@
 defmodule KddNotionEx.CMS.Properties do
+  import KddNotionEx.Templates
 
-  def add_property(page, property) do
-    Map.merge(page, property)
+  def serialize(type, key, value)
+
+  def serialize(KddNotionEx.Types.Text, key, value) do
+    text_prop(key, value)
   end
 
-  def number_prop(key, value) when is_binary(value) do
-    number =
-    if String.contains?(value, ".") do
-      String.to_float(value)
-    else
-      String.to_integer(value)
-    end
-
-    number_prop(key, number)
+  def serialize(KddNotionEx.Types.Date, key, value) do
+    date_prop(key, value)
   end
 
-  def number_prop(key, value) do
-    %{
-      key => %{
-        type: "number",
-        number: value
-      }
-    }
+  def serialize(KddNotionEx.Types.Phone, key, value) do
+    phone_number_prop(key, value)
   end
 
-  def phone_number(key, value) do
-    %{
-      key => %{
-        type: "phone_number",
-        phone_number: value
-      }
-    }
+  # def serialize(KddNotionEx.Types.Formula, key, value)
+  def serialize(KddNotionEx.Types.Title, key, value) do
+    title_prop(key, value)
   end
 
-  def datestamp(key) do
-    date(key, Date.to_iso8601(Date.utc_today))
+  def serialize(KddNotionEx.Types.Select, key, value) do
+    select_prop(key, value)
   end
 
-  def timestamp(key) do
-    date(key, NaiveDateTime.to_iso8601(NaiveDateTime.utc_now))
+  def serialize(KddNotionEx.Types.URL, key, value) do
+    url_prop(key, value)
+  end
+  def serialize(KddNotionEx.Types.MultiSelect, key, value) do
+    multi_select_prop(key, value)
   end
 
-  def date(key, value) do
-    %{
-      key => %{
-        type: "date",
-        date: %{
-          start: value
-        }
-      }
-    }
+  def serialize(KddNotionEx.Types.Checkbox, key, value) do
+    checkbox_prop(key, value)
   end
 
-  def date(key, sv, ev) do
-    %{
-      key => %{
-        type: "date",
-        date: %{
-          start: sv,
-          end: ev
-        }
-      }
-    }
+  def serialize(number, key, value) when number in [:integer, :float, :decimal] do
+    number_prop(key, value)
   end
 
-  def relation(key, database, value) do
-    %{
-      key => %{
-        type: "relation",
-        relation: [%{
-          id: value,
-          database_id: database
-        }]
-      }
-    }
-  end
 
-  def relation(key, value) do
-    %{
-      key => %{
-        type: "relation",
-        relation: [%{
-          id: value
-        }]
-      }
-    }
-  end
-
-  def checkbox(key, value) when value in [true, false] do
-    %{
-      key => %{
-        checkbox: value
-      }
-    }
-  end
 end

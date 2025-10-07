@@ -4,9 +4,19 @@ defmodule KddNotionEx.CMS.ExamplePage do
   schema "Example Pages" do
     field :"Name", KddNotionEx.Types.Title
     field :"Number", :integer
-    field :"Publish Date", :naive_datetime
+    field :"Publish Date", KddNotionEx.Types.Date
     field :"Status", KddNotionEx.Types.Select
-    field :"Description", :string
+    field :"Description", KddNotionEx.Types.Text
+  end
+
+  def dummy() do
+    %__MODULE__{
+      "Name": "Post A",
+      "Number": 1,
+      "Publish Date": Date.utc_today(),
+      "Status": "Approved",
+      "Description": "Lorem ipsum..."
+    }
   end
 
 end

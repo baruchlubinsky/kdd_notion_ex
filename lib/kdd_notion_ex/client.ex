@@ -2,7 +2,7 @@ defmodule KddNotionEx.Client do
   def headers() do
     [
       {"Content-Type", "application/json"},
-      {"Notion-Version", "2025‑09‑03"}
+      {"Notion-Version", "2025-09-03"}
     ]
   end
 

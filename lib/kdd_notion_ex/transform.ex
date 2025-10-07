@@ -3,7 +3,7 @@ require Logger
 
   def table_to_options(data, column) do
     Enum.flat_map(data, fn
-      %{"id" => id, "properties" => %{^column => %{"title" => [%{"plain_text" => c}]}}} -> [{c, id}]
+      %{"id" => id, "properties" => %{^column => value}} -> [{parse_property(value), id}]
       _ -> []
     end)
 
@@ -24,6 +24,11 @@ require Logger
     end)
   end
 
+  def page_as_record(page, model) do
+    page_as_record(page)
+    |> model.load()
+  end
+
   def parse_date(string) when is_nil(string), do: nil
 
   # Dates without times in DD-MM-YYYY
@@ -38,13 +43,15 @@ require Logger
 
   def parse_date(string) do
     case DateTime.from_iso8601(string) do
-      {:ok, dt, _} -> dt
+      {:ok, dt, _offset} ->
+        dt
       {:error, :invalid_format} ->
         Logger.warning("Invalid date string #{string}")
         string
       end
   end
 
+  def parse_property(%{"string" => value, "type" => "string"}), do: value
   def parse_property(%{"number" => value, "type" => "number"}), do: value
   def parse_property(%{"checkbox" => value, "type" => "checkbox"}), do: value
   def parse_property(%{"relation" => [%{"id" => value}], "type" => "relation"}), do: value

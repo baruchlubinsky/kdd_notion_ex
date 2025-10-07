@@ -4,11 +4,14 @@ defmodule KddNotionEx.Page do
     Req.get!(req, url: "/pages/#{page_id}")
   end
 
+  def load(req, page_id) do
+    get(req, page_id)
+    |> KddNotionEx.Client.response()
+  end
+
   def fetch(req, page_id) do
     {_, data} = Cachex.fetch(KddNotionEx.Cache.pages(), page_id, fn id ->
-      page =
-        get(req, id)
-        |> KddNotionEx.Client.response()
+      page = load(req, id)
 
       if Enum.any?(page["properties"], fn {_name, property} ->
         property["type"] == "files" && Enum.any?(property["files"], fn p -> Map.has_key?(p["file"], "expiry_time") end)
