@@ -25,8 +25,7 @@ require Logger
   end
 
   def page_as_record(page, model) do
-    page_as_record(page)
-    |> model.load()
+    model.load(page)
   end
 
   def parse_date(string) when is_nil(string), do: nil

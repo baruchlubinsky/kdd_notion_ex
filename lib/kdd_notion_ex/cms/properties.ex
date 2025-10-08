@@ -3,7 +3,8 @@ defmodule KddNotionEx.CMS.Properties do
 
   def serialize(type, key, value)
 
-  def serialize(:id, key, value) do
+  def serialize(:binary_id, key, value) do
+    key = String.replace_suffix("#{key}", "_id", "")
     relation_prop(key, value)
   end
 
@@ -15,7 +16,7 @@ defmodule KddNotionEx.CMS.Properties do
     date_prop(key, value)
   end
 
-  def serialize(KddNotionEx.Types.DateRange, key, [start_value, end_value]) do
+  def serialize(KddNotionEx.Types.DateRange, key, {start_value, end_value}) do
     date_range_prop(key, start_value, end_value)
   end
 

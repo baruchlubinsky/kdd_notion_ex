@@ -8,6 +8,7 @@ defmodule KddNotionEx.CMS.Model do
       alias KddNotionEx.Types
 
       @primary_key {:id, :binary_id, autogenerate: false}
+      @foreign_key_type :binary_id
 
       def validate_notion_ds(req, id) do
 
@@ -78,9 +79,39 @@ defmodule KddNotionEx.CMS.Model do
         |> Enum.map(fn {_type, name} -> name end)
       end
 
-      def load(params) do
-         cast(struct(__MODULE__), params, field_names())
-         |> apply_changes()
+      def load(changeset \\ __MODULE__, params) do
+        changeset(changeset, params)
+        |> apply_changes()
+      end
+
+      def changeset(changeset \\ __MODULE__, params)
+
+      def changeset(changeset, %{"id" => id, "properties" => _} = params) do
+        properties = Map.get(params, "properties", %{})
+
+        changeset =
+         cast(struct(changeset, id: params["id"]), properties, field_names())
+
+        Enum.filter(relations(), fn {_, _, field} ->
+          "#{field}" in Map.keys(properties)
+        end)
+        |> Enum.reduce(changeset, fn {related, :one, field}, acc ->
+          cast_assoc(acc, field, with: fn s, p ->
+            case p["relation"] do
+              [] -> %Ecto.Changeset{action: :ignore}
+              [data] -> related.changeset(data)
+              other -> raise Ecto.CastError
+            end
+          end)
+        end)
+      end
+
+      def changeset(changeset, %{"id" => id}) do
+        change(struct(changeset, id: id))
+      end
+
+      def changeset(changeset, params) do
+        cast(struct(changeset), params, field_names())
       end
 
       defoverridable(load: 1)
