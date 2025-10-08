@@ -73,16 +73,24 @@ defmodule KddNotionEx.CMS.Model do
         |> Enum.map(&KddNotionEx.CMS.Model.notion_property/1)
       end
 
-      def serialize(record) do
-        Enum.map(fields(), fn {type, field} ->
-          KddNotionEx.CMS.Properties.serialize(type, field, Map.fetch!(record, field))
-        end)
+      def field_names() do
+        fields()
+        |> Enum.map(fn {_type, name} -> name end)
       end
+
+      def load(params) do
+         cast(struct(__MODULE__), params, field_names())
+         |> apply_changes()
+      end
+
+      defoverridable(load: 1)
+
     end
   end
 
   def ecto_type_to_notion_type(KddNotionEx.Types.Text), do: "rich_text"
   def ecto_type_to_notion_type(KddNotionEx.Types.Date), do: "date"
+  def ecto_type_to_notion_type(KddNotionEx.Types.DateRange), do: "date"
   def ecto_type_to_notion_type(KddNotionEx.Types.Phone), do: "phone"
   def ecto_type_to_notion_type(KddNotionEx.Types.Formula), do: "formula"
   def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
@@ -102,6 +110,15 @@ defmodule KddNotionEx.CMS.Model do
         ecto_type_to_notion_type(type) => value
       }
     }
+  end
+
+  def serialize(record) do
+    record.__struct__.fields()
+    |> Enum.reject(fn {_type, field} -> is_nil(Map.get(record, field)) end)
+    |> Enum.map(fn {type, field} ->
+      KddNotionEx.CMS.Properties.serialize(type, field, Map.fetch!(record, field))
+    end)
+    |> Enum.reduce(%{}, fn e, acc -> Map.merge(acc, e) end )
   end
 
 end

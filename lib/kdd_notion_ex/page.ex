@@ -33,7 +33,7 @@ defmodule KddNotionEx.Page do
 
   def create_record(req, properties, database_id) do
     payload = %{
-      parent: %{database_id: database_id},
+      parent: %{data_source_id: database_id},
       properties: properties
     }
     response = Req.post!(req, url: "/pages", json: payload)
@@ -42,7 +42,6 @@ defmodule KddNotionEx.Page do
       %Req.Response{status: 200, body: body} ->
         Cachex.put(KddNotionEx.Cache.pages(), body["id"], body)
     end
-
     response
   end
 

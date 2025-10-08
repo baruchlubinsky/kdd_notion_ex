@@ -92,19 +92,58 @@ defmodule KddNotionEx.Templates do
     }
   end
 
+  def date_prop(key, value) when is_binary(value) do
+    %{
+      key => %{
+        type: "date",
+        date: %{
+          start: value
+        }
+      }
+    }
+  end
+
   def date_prop(key, value) do
     %{
       key => %{
         type: "date",
         date: %{
-          start: Date.to_iso8601(value)
+          start: DateTime.to_iso8601(value)
+        }
+      }
+    }
+  end
+
+  def date_range_prop(key, start_value, end_value) when is_binary(start_value) and is_binary(end_value) do
+    %{
+      key => %{
+        type: "date",
+        date: %{
+          start: start_value,
+          end: end_value
+        }
+      }
+    }
+  end
+
+  def date_range_prop(key, start_value, end_value) do
+    %{
+      key => %{
+        type: "date",
+        date: %{
+          start: DateTime.to_iso8601(start_value),
+          end: DateTime.to_iso8601(end_value)
         }
       }
     }
   end
 
   def datestamp(key) do
-    date_prop(key, Date.utc_today)
+    date_prop(key, Date.utc_today())
+  end
+
+  def timestamp(key) do
+    date_prop(key, DateTime.utc_now())
   end
 
   def relation_prop(key, database, value) do

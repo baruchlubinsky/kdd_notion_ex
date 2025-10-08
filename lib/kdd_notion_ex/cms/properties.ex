@@ -3,6 +3,10 @@ defmodule KddNotionEx.CMS.Properties do
 
   def serialize(type, key, value)
 
+  def serialize(:id, key, value) do
+    relation_prop(key, value)
+  end
+
   def serialize(KddNotionEx.Types.Text, key, value) do
     text_prop(key, value)
   end
@@ -11,11 +15,14 @@ defmodule KddNotionEx.CMS.Properties do
     date_prop(key, value)
   end
 
+  def serialize(KddNotionEx.Types.DateRange, key, [start_value, end_value]) do
+    date_range_prop(key, start_value, end_value)
+  end
+
   def serialize(KddNotionEx.Types.Phone, key, value) do
     phone_number_prop(key, value)
   end
 
-  # def serialize(KddNotionEx.Types.Formula, key, value)
   def serialize(KddNotionEx.Types.Title, key, value) do
     title_prop(key, value)
   end
@@ -38,6 +45,9 @@ defmodule KddNotionEx.CMS.Properties do
   def serialize(number, key, value) when number in [:integer, :float, :decimal] do
     number_prop(key, value)
   end
+
+  # def serialize(KddNotionEx.Types.Formula, key, value)
+
 
 
 end

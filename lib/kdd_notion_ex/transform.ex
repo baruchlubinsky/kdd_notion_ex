@@ -53,10 +53,12 @@ require Logger
 
   def parse_property(%{"string" => value, "type" => "string"}), do: value
   def parse_property(%{"number" => value, "type" => "number"}), do: value
+  def parse_property(%{"phone_number" => value, "type" => "phone_number"}), do: value
   def parse_property(%{"checkbox" => value, "type" => "checkbox"}), do: value
   def parse_property(%{"relation" => [%{"id" => value}], "type" => "relation"}), do: value
   def parse_property(%{"relation" => value, "type" => "relation"}), do: value
   def parse_property(%{"title" => [%{"plain_text" => value}], "type" => "title"}), do: value
+  def parse_property(%{"rich_text" => [%{"plain_text" => value}], "type" => "rich_text"}), do: value
   def parse_property(%{"date" => %{"start" => start_time, "end" => end_time}, "type" => "date"}), do: {parse_date(start_time), parse_date(end_time)}
   def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: parse_date(value)
   def parse_property(%{"formula" => prop, "type" => "formula"}), do: parse_property(prop)
