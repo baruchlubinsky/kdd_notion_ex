@@ -12,6 +12,10 @@ defmodule KddNotionEx.CMS.Properties do
     text_prop(key, value)
   end
 
+  def serialize(KddNotionEx.Types.Number, key, value) do
+    number_prop(key, value)
+  end
+
   def serialize(KddNotionEx.Types.Date, key, value) do
     date_prop(key, value)
   end
