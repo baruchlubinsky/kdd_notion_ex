@@ -120,6 +120,7 @@ defmodule KddNotionEx.CMS.Model do
   end
 
   def ecto_type_to_notion_type(KddNotionEx.Types.Text), do: "rich_text"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Number), do: "number"
   def ecto_type_to_notion_type(KddNotionEx.Types.Date), do: "date"
   def ecto_type_to_notion_type(KddNotionEx.Types.DateRange), do: "date"
   def ecto_type_to_notion_type(KddNotionEx.Types.Phone), do: "phone"
