@@ -125,6 +125,7 @@ defmodule KddNotionEx.CMS.Model do
   def ecto_type_to_notion_type(KddNotionEx.Types.DateRange), do: "date"
   def ecto_type_to_notion_type(KddNotionEx.Types.Phone), do: "phone"
   def ecto_type_to_notion_type(KddNotionEx.Types.Formula), do: "formula"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Files), do: "files"
   def ecto_type_to_notion_type(KddNotionEx.Types.Title), do: "title"
   def ecto_type_to_notion_type(KddNotionEx.Types.Select), do: "select"
   def ecto_type_to_notion_type(KddNotionEx.Types.MultiSelect), do: "multi_select"
