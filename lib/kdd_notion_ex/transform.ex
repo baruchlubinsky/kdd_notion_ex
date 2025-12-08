@@ -1,5 +1,5 @@
 defmodule KddNotionEx.Transform do
-require Logger
+  require Logger
 
   def table_to_options(data, column) do
     Enum.flat_map(data, fn
@@ -51,6 +51,8 @@ require Logger
   end
 
   def parse_property(%{"string" => value, "type" => "string"}), do: value
+  def parse_property(%{"email" => value, "type" => "email"}), do: value
+  def parse_property(%{"url" => value, "type" => "url"}), do: value
   def parse_property(%{"number" => value, "type" => "number"}), do: value
   def parse_property(%{"phone_number" => value, "type" => "phone_number"}), do: value
   def parse_property(%{"checkbox" => value, "type" => "checkbox"}), do: value
@@ -66,7 +68,6 @@ require Logger
   def parse_property(%{"status" => %{"name" => value}, "type" => "status"}), do: value
 
   def parse_property(%{"multi_select" => values, "type" => "multi_select"}), do: Enum.map(values, fn v -> v["name"] end)
-
 
   def parse_property(%{"array" => [prop]}), do: parse_property(prop)
 

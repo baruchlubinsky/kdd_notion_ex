@@ -55,13 +55,24 @@ defmodule KddNotionEx.Templates do
 
   def url_prop(key, value) do
     %{
-      key => %{
-        select: %{
+      key =>
+        %{
+          type: "url", 
           url: value
         }
-      }
     }
   end
+
+  def email_prop(key, value) do
+    %{
+      key =>
+        %{
+          type: "email", 
+          email: value
+        }
+    }
+  end
+
 
   def number_prop(key, value) when is_binary(value) do
     number =

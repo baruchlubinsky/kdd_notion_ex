@@ -39,6 +39,11 @@ defmodule KddNotionEx.CMS.Properties do
   def serialize(KddNotionEx.Types.URL, key, value) do
     url_prop(key, value)
   end
+
+  def serialize(KddNotionEx.Types.Email, key, value) do
+    email_prop(key, value)
+  end
+
   def serialize(KddNotionEx.Types.MultiSelect, key, value) do
     multi_select_prop(key, value)
   end

@@ -131,6 +131,7 @@ defmodule KddNotionEx.CMS.Model do
   def ecto_type_to_notion_type(KddNotionEx.Types.MultiSelect), do: "multi_select"
   def ecto_type_to_notion_type(KddNotionEx.Types.Checkbox), do: "checkbox"
   def ecto_type_to_notion_type(KddNotionEx.Types.URL), do: "url"
+  def ecto_type_to_notion_type(KddNotionEx.Types.Email), do: "email"
   def ecto_type_to_notion_type(:string), do: "rich_text"
   def ecto_type_to_notion_type(:id), do: "id"
 
