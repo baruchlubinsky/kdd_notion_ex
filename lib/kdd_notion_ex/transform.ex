@@ -66,7 +66,8 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"rollup" => prop, "type" => "rollup"}), do: parse_property(prop)
   def parse_property(%{"select" => %{"name" => value}, "type" => "select"}), do: value
   def parse_property(%{"status" => %{"name" => value}, "type" => "status"}), do: value
-
+  def parse_property(%{"unique_id" => %{"number" => number, "prefix" => prefix}, "type" => "unique_id"}) when is_nil(prefix), do: "#{number}"
+  def parse_property(%{"unique_id" => %{"number" => number, "prefix" => prefix}, "type" => "unique_id"}), do: "#{prefix}-#{number}"
   def parse_property(%{"multi_select" => values, "type" => "multi_select"}), do: Enum.map(values, fn v -> v["name"] end)
 
   def parse_property(%{"array" => [prop]}), do: parse_property(prop)
