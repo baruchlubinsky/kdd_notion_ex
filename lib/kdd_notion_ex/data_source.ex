@@ -10,11 +10,11 @@ defmodule KddNotionEx.DataSource do
     |> case do
       %Req.Response{status: 200, body: response} ->
         if response["has_more"] do
-        query = Map.put(query, "start_cursor", response["next_cursor"])
-        response["results"] ++ query_paged(req, data_source_id, query)
-      else
-        response["results"]
-      end
+          query = Map.put(query, "start_cursor", response["next_cursor"])
+          response["results"] ++ query_paged(req, data_source_id, query)
+        else
+          response["results"]
+        end
     end
   end
 
@@ -22,14 +22,26 @@ defmodule KddNotionEx.DataSource do
     Req.post!(req, url: "/data_sources/#{data_source_id}/query", json: query)
     |> case do
       %Req.Response{status: 200, body: response} ->
-        if response["has_more"] do
-        query = query || %{}
-          |> Map.put("start_cursor", response["next_cursor"])
-        response["results"] ++ query_paged(req, data_source_id, query)
-      else
-        response["results"]
-      end
+          if response["has_more"] do
+          query = query || %{}
+            |> Map.put("start_cursor", response["next_cursor"])
+          response["results"] ++ query_paged(req, data_source_id, query)
+        else
+          response["results"]
+        end
     end
   end
+
+  @doc """
+    If you're expecting less than a page of results, and don't want to  fetch a whole table.
+  """
+  def query_limit(req, data_source_id, query \\ %{}) do
+    Req.post!(req, url: "/data_sources/#{data_source_id}/query", json: query)
+    |> case do
+      %Req.Response{status: 200, body: response} ->
+         response["results"]
+    end
+  end
+
 
 end

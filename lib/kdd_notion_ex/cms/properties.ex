@@ -56,7 +56,7 @@ defmodule KddNotionEx.CMS.Properties do
     number_prop(key, value)
   end
 
-  def serialize(KddNotionEx.Types.UnqiueID, key, value) do
+  def serialize(KddNotionEx.Types.UnqiueID, _key, _value) do
     %{} # Don't send Unique ID's
   end
 

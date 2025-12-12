@@ -70,6 +70,9 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"unique_id" => %{"number" => number, "prefix" => prefix}, "type" => "unique_id"}), do: "#{prefix}-#{number}"
   def parse_property(%{"multi_select" => values, "type" => "multi_select"}), do: Enum.map(values, fn v -> v["name"] end)
 
+  def parse_property(%{"created_time" => value, "type" => "created_time"}), do: parse_date(value) 
+  def parse_property(%{"updated_time" => value, "type" => "updated_time"}), do: parse_date(value) 
+
   def parse_property(%{"array" => [prop]}), do: parse_property(prop)
 
   def parse_property(other), do: other

@@ -10,11 +10,11 @@ defmodule KddNotionEx.Page do
   end
 
   def fetch(req, page_id) do
-    {_, data} = Cachex.fetch(KddNotionEx.Cache.pages(), page_id, fn id ->
+    Cachex.fetch!(KddNotionEx.Cache.pages(), page_id, fn id ->
       page = load(req, id)
 
       if Enum.any?(page["properties"], fn {_name, property} ->
-        property["type"] == "files" && Enum.any?(property["files"], fn p -> Map.has_key?(p["file"], "expiry_time") end)
+        property["type"] == "files" 
       end) do
         {
           :commit,
@@ -28,7 +28,6 @@ defmodule KddNotionEx.Page do
         }
       end
     end)
-    data
   end
 
   def create_record(req, properties, database_id) do
@@ -42,10 +41,11 @@ defmodule KddNotionEx.Page do
       %Req.Response{status: 200, body: body} ->
         Cachex.put(KddNotionEx.Cache.pages(), body["id"], body)
     end
-    response
+    
+    KddNotionEx.Client.response(response)
   end
 
-  def update(req, properties, page_id) do
+  def update(req, page_id, properties) do
     Cachex.del(KddNotionEx.Cache.pages(), page_id)
     payload = %{
       properties: properties
@@ -57,7 +57,7 @@ defmodule KddNotionEx.Page do
         Cachex.put(KddNotionEx.Cache.pages(), body["id"], body)
     end
 
-    response
+    KddNotionEx.Client.response(response)
   end
 
   def fetch_content(req, page_id) do
