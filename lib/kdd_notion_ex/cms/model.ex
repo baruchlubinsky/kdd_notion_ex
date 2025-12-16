@@ -79,8 +79,8 @@ defmodule KddNotionEx.CMS.Model do
         |> Enum.map(fn {_type, name} -> name end)
       end
 
-      def load(changeset \\ __MODULE__, params) do
-        changeset(changeset, params)
+      def load(params) do
+        changeset(__MODULE__, params)
         |> apply_changes()
       end
 
@@ -90,22 +90,26 @@ defmodule KddNotionEx.CMS.Model do
         properties = Map.get(params, "properties", %{})
 
         changeset =
-         cast(struct(changeset, id: params["id"]), properties, field_names())
+          cast(struct(changeset, id: params["id"]), properties, field_names())
 
-        Enum.filter(relations(), fn {_, _, field} ->
-          "#{field}" in Map.keys(properties)
-        end)
-        |> Enum.reduce(changeset, 
-          fn {related, :one, field}, acc ->
-            value = 
-              case properties["#{field}"]["relation"] do
-                [] -> %Ecto.Changeset{action: :ignore}
-                data -> related.changeset(hd(data))
-              end
-            put_assoc(acc, field, value)
-          {related, :many, field}, acc -> 
-            put_assoc(acc, field, Enum.map(properties["#{field}"]["relation"], fn r -> related.changeset(r) end))
+        if length(relations()) == 0 do
+          changeset
+        else
+          Enum.filter(relations(), fn {_, _, field} ->
+            "#{field}" in Map.keys(properties)
           end)
+          |> Enum.reduce(changeset, 
+            fn {related, :one, field}, acc ->
+              value = 
+                case properties["#{field}"]["relation"] do
+                  [] -> nil
+                  data -> related.changeset(hd(data))
+                end
+              put_assoc(acc, field, value)
+            {related, :many, field}, acc ->
+              put_assoc(acc, field, Enum.map(properties["#{field}"]["relation"], fn r -> related.changeset(r) end))
+            end)
+          end
       end
 
       def changeset(changeset, %{"id" => id}) do
