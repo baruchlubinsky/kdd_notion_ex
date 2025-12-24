@@ -60,6 +60,7 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"relation" => value, "type" => "relation"}), do: value
   def parse_property(%{"title" => [%{"plain_text" => value}], "type" => "title"}), do: value
   def parse_property(%{"rich_text" => [%{"plain_text" => value}], "type" => "rich_text"}), do: value
+  def parse_property(%{"date" => %{"start" => start_time, "end" => nil}, "type" => "date"}), do: parse_date(start_time)
   def parse_property(%{"date" => %{"start" => start_time, "end" => end_time}, "type" => "date"}), do: {parse_date(start_time), parse_date(end_time)}
   def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: parse_date(value)
   def parse_property(%{"formula" => prop, "type" => "formula"}), do: parse_property(prop)
@@ -73,7 +74,7 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"created_time" => value, "type" => "created_time"}), do: parse_date(value) 
   def parse_property(%{"updated_time" => value, "type" => "updated_time"}), do: parse_date(value) 
 
-  def parse_property(%{"array" => [prop]}), do: parse_property(prop)
+  def parse_property(%{"array" => [prop]}), do: parse_property(IO.inspect(prop))
 
   def parse_property(other), do: other
 

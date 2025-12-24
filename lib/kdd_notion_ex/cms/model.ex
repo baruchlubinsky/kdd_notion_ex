@@ -86,6 +86,8 @@ defmodule KddNotionEx.CMS.Model do
 
       def changeset(changeset \\ __MODULE__, params)
 
+      def changeset(nil, _params), do: %Ecto.Changeset{action: :ignore}
+
       def changeset(changeset, %{"id" => id, "properties" => _} = params) do
         properties = Map.get(params, "properties", %{})
 
@@ -97,12 +99,13 @@ defmodule KddNotionEx.CMS.Model do
         end)
         |> Enum.reduce(changeset, 
           fn {related, :one, field}, acc ->
-            value = 
-              case properties["#{field}"]["relation"] do
-                [] -> %Ecto.Changeset{action: :ignore}
-                data -> related.changeset(hd(data))
-              end
-            put_assoc(acc, field, value)
+            case properties["#{field}"]["relation"] do
+              [] -> 
+                acc
+              data -> 
+                value = related.changeset(hd(data))
+                put_assoc(acc, field, value)
+            end
           {related, :many, field}, acc -> 
             put_assoc(acc, field, Enum.map(properties["#{field}"]["relation"], fn r -> related.changeset(r) end))
           end)
