@@ -59,6 +59,7 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"relation" => [%{"id" => value}], "type" => "relation"}), do: value
   def parse_property(%{"relation" => value, "type" => "relation"}), do: value
   def parse_property(%{"title" => [%{"plain_text" => value}], "type" => "title"}), do: value
+  def parse_property(%{"rich_text" => [], "type" => "rich_text"}), do: ""
   def parse_property(%{"rich_text" => [%{"plain_text" => value}], "type" => "rich_text"}), do: value
   def parse_property(%{"date" => %{"start" => start_time, "end" => end_time}, "type" => "date"}), do: {parse_date(start_time), parse_date(end_time)}
   def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: parse_date(value)
