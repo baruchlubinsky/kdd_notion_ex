@@ -61,6 +61,16 @@ defmodule KddNotionEx.Transform do
   def parse_property(%{"title" => [%{"plain_text" => value}], "type" => "title"}), do: value
   def parse_property(%{"rich_text" => [], "type" => "rich_text"}), do: ""
   def parse_property(%{"rich_text" => [%{"plain_text" => value}], "type" => "rich_text"}), do: value
+  def parse_property(%{"rich_text" => values, "type" => "rich_text"}) do
+    Enum.map(values, fn %{"plain_text" => line} ->
+      if line == "\n" do
+        "<br />"
+      else
+        line
+      end
+    end)
+    |> Enum.join()
+  end 
   def parse_property(%{"date" => %{"start" => start_time, "end" => end_time}, "type" => "date"}), do: {parse_date(start_time), parse_date(end_time)}
   def parse_property(%{"date" => %{"start" => value}, "type" => "date"}), do: parse_date(value)
   def parse_property(%{"formula" => prop, "type" => "formula"}), do: parse_property(prop)
